@@ -1,0 +1,250 @@
+substitutions:
+  devicename: sonoff01
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+  ap:
+    ssid: ${devicename}
+    password: !secret ap_pw
+captive_portal:
+web_server:
+  port: !secret web_port
+  auth:
+    username: !secret web_user
+    password: !secret web_pw
+api:
+  password: !secret api_pw
+ota:
+  password: !secret ota_pw
+
+logger:
+
+esphome:
+  name: ${devicename}
+  platform: ESP8266
+  board: esp01_1m
+
+
+mqtt:
+  broker: 192.168.50.10
+
+remote_receiver:
+  pin: RX
+  tolerance: 50%
+  filter: 500us
+  idle: 3ms
+  # dump: rc_switch
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "按钮"
+    on_press:
+      - switch.toggle: relay
+  - platform: gpio
+    name: "左窗"
+    pin:
+      number: 2
+      mode: INPUT_PULLUP
+  - platform: remote_receiver
+    name: "rf1"
+    filters:
+      - delayed_off: 240ms
+    rc_switch_raw: 
+      code: "000001000101111011010001"
+    on_multi_click:
+    - timing:
+        - ON for at most 1s
+        - OFF for at least 300ms
+      then:
+        - logger.log: "dot"
+        - mqtt.publish:
+            topic: rf1/dot
+            payload: "dot"
+      invalid_cooldown: 0s
+    - timing:
+        - ON for at most 1s
+        - OFF for at most 1s
+        - ON for at most 1s
+        - OFF for at least 300ms
+      then:
+        - logger.log: "dot dot"
+        - mqtt.publish:
+            topic: rf1/dotdot
+            payload: "dotdot"
+      invalid_cooldown: 0s
+    - timing:
+        - ON for at least 2s
+      then:
+        - logger.log: "dash"
+        - mqtt.publish:
+            topic: rf1/dash
+            payload: "dash"
+    - timing:
+        - ON for at most 1s
+        - OFF for at most 1s
+        - ON for at least 2s
+      then:
+        - logger.log: "dot dash"
+        - mqtt.publish:
+            topic: rf1/dotdash
+            payload: "dotdash"
+      invalid_cooldown: 0s
+  - platform: remote_receiver
+    name: "rf2"
+    filters:
+      - delayed_off: 240ms
+    rc_switch_raw: 
+      code: "111110000001111011010001"
+    on_multi_click:
+      - timing:
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot"
+          - mqtt.publish:
+              topic: rf2/dot
+              payload: "dot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot dot"
+          - mqtt.publish:
+              topic: rf2/dotdot
+              payload: "dotdot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at least 2s
+        then:
+          - logger.log: "dash"
+          - mqtt.publish:
+              topic: rf2/dash
+              payload: "dash"
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at least 2s
+        then:
+          - logger.log: "dot dash"
+          - mqtt.publish:
+              topic: rf2/dotdash
+              payload: "dotdash"
+        invalid_cooldown: 0s
+  - platform: remote_receiver
+    name: "rf3"
+    filters:
+      - delayed_off: 240ms
+    rc_switch_raw: 
+      code: "111001111101011110100001"
+    on_multi_click:
+      - timing:
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot"
+          - mqtt.publish:
+              topic: rf3/dot
+              payload: "dot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot dot"
+          - mqtt.publish:
+              topic: rf3/dotdot
+              payload: "dotdot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at least 2s
+        then:
+          - logger.log: "dash"
+          - mqtt.publish:
+              topic: rf3/dash
+              payload: "dash"
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at least 2s
+        then:
+          - logger.log: "dot dash"
+          - mqtt.publish:
+              topic: rf3/dotdash
+              payload: "dotdash"
+        invalid_cooldown: 0s
+  - platform: remote_receiver
+    name: "rf3"
+    filters:
+      - delayed_off: 240ms
+    rc_switch_raw: 
+      code: "111011110101001110100001"
+    on_multi_click:
+      - timing:
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot"
+          - mqtt.publish:
+              topic: rf4/dot
+              payload: "dot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot dot"
+          - mqtt.publish:
+              topic: rf4/dotdot
+              payload: "dotdot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at least 2s
+        then:
+          - logger.log: "dash"
+          - mqtt.publish:
+              topic: rf4/dash
+              payload: "dash"
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at least 2s
+        then:
+          - logger.log: "dot dash"
+          - mqtt.publish:
+              topic: rf4/dotdash
+              payload: "dotdash"
+        invalid_cooldown: 0s
+
+sensor:
+  - platform: dht
+    model: DHT11
+    pin: TX
+    temperature:
+      name: "outdoorTemperature"
+    humidity:
+      name: "outdoorHumidity"
+    update_interval: 30s
+
+switch:
+  - platform: gpio
+    name: "窗灯"
+    pin: GPIO12
+    id: relay
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes

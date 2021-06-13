@@ -1,0 +1,54 @@
+substitutions:
+  devicename: sonoff02
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+  ap:
+    ssid: ${devicename}
+    password: !secret ap_pw
+captive_portal:
+web_server:
+  port: !secret web_port
+  auth:
+    username: !secret web_user
+    password: !secret web_pw
+api:
+  password: !secret api_pw
+ota:
+  password: !secret ota_pw
+
+logger:
+
+esphome:
+  name: ${devicename}
+  platform: ESP8266
+  board: esp01_1m
+
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Button"
+    on_press:
+      - switch.toggle: relay
+  - platform: gpio
+    name: "gpio2"
+    pin:
+      number: 2
+      mode: INPUT_PULLUP
+      
+switch:
+  - platform: gpio
+    name: "Sonoff Basic Relay"
+    pin: GPIO12
+    id: relay
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes

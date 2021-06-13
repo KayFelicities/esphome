@@ -1,0 +1,49 @@
+substitutions:
+  devicename: sonoff03
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+  ap:
+    ssid: ${devicename}
+    password: !secret ap_pw
+captive_portal:
+web_server:
+  port: !secret web_port
+  auth:
+    username: !secret web_user
+    password: !secret web_pw
+api:
+  password: !secret api_pw
+ota:
+  password: !secret ota_pw
+
+logger:
+
+esphome:
+  name: ${devicename}
+  platform: ESP8266
+  board: esp01_1m
+
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "按钮"
+    on_press:
+      - switch.toggle: relay
+      
+switch:
+  - platform: gpio
+    name: "沙发灯"
+    pin: GPIO12
+    id: relay
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes

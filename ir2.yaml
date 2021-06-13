@@ -1,0 +1,34 @@
+substitutions:
+  devicename: ir2
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+  ap:
+    ssid: ${devicename}
+    password: !secret ap_pw
+captive_portal:
+web_server:
+  port: !secret web_port
+  auth:
+    username: !secret web_user
+    password: !secret web_pw
+api:
+  password: !secret api_pw
+ota:
+  password: !secret ota_pw
+
+logger:
+
+esphome:
+  name: ${devicename}
+  platform: ESP8266
+  board: esp8285
+
+binary_sensor:
+  - platform: gpio
+    name: "门"
+    pin:
+      number: TX
+      mode: INPUT_PULLUP

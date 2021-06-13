@@ -1,0 +1,47 @@
+substitutions:
+  devicename: esp32s
+
+esphome:
+  name: ${devicename}
+  platform: ESP32
+  board: nodemcu-32s
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+  ap:
+    ssid: ${devicename}
+    password: !secret ap_pw
+captive_portal:
+web_server:
+  port: !secret web_port
+  auth:
+    username: !secret web_user
+    password: !secret web_pw
+api:
+  password: !secret api_pw
+ota:
+  password: !secret ota_pw
+
+logger:
+
+esp32_ble_tracker:
+
+sensor:
+  - platform: xiaomi_cgg1
+    mac_address: "58:2D:34:10:41:3B"
+    temperature:
+      name: "CGG1 Temperature"
+    humidity:
+      name: "CGG1 Humidity"
+    battery_level:
+      name: "CGG1 Battery"
+  # - platform: xiaomi_miscale2
+  #   mac_address: 'EF:42:1D:5C:A9:32'
+  #   weight:
+  #     name: "Scale Weight"
+  #   impedance:
+  #     name: "Scale Impedance"
+
+

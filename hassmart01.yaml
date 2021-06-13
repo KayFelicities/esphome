@@ -1,0 +1,86 @@
+substitutions:
+  devicename: hassmart01
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+  ap:
+    ssid: ${devicename}
+    password: !secret ap_pw
+captive_portal:
+web_server:
+  port: !secret web_port
+  auth:
+    username: !secret web_user
+    password: !secret web_pw
+api:
+  password: !secret api_pw
+ota:
+  password: !secret ota_pw
+
+logger:
+
+esphome:
+  name: ${devicename}
+  platform: ESP8266
+  board: esp01_1m
+
+
+binary_sensor:
+  - platform: gpio
+    name: '${devicename}_btn1'
+    id: btn1
+    # internal: true
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    filters:
+      - delayed_on: 40ms
+      - delayed_off: 40ms
+    on_press:
+      - switch.toggle: relay1
+  - platform: gpio
+    name: '${devicename}_btn2'
+    id: btn2
+    # internal: true
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: True
+    filters:
+      - delayed_on: 40ms
+      - delayed_off: 40ms
+    on_press:
+      - switch.toggle: relay2
+  - platform: gpio
+    name: '${devicename}_btn3'
+    id: btn3
+    # internal: true
+    pin:
+      number: GPIO2
+      mode: INPUT_PULLUP
+      inverted: True
+    filters:
+      - delayed_on: 40ms
+      - delayed_off: 40ms
+    on_press:
+      - switch.toggle: relay3
+
+switch:
+  - platform: gpio
+    name: "${devicename}_light1"
+    pin: GPIO12
+    id: relay1
+    icon: "mdi:lightbulb"
+  - platform: gpio
+    name: "${devicename}_light2"
+    pin: GPIO5
+    id: relay2
+    icon: "mdi:lightbulb"
+  - platform: gpio
+    name: "${devicename}_light3"
+    pin: GPIO4
+    id: relay3
+    icon: "mdi:lightbulb"

@@ -1,0 +1,76 @@
+substitutions:
+  devicename: esp8266
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+  ap:
+    ssid: "Esp32 Fallback Hotspot"
+    password: !secret ap_pw
+captive_portal:
+web_server:
+  port: !secret web_port
+  auth:
+    username: !secret web_user
+    password: !secret web_pw
+api:
+  password: !secret api_pw
+ota:
+  password: !secret ota_pw
+
+logger:
+
+esphome:
+  name: ${devicename}
+  platform: ESP8266
+  board: esp01_1m
+
+
+# uart:
+#   rx_pin: 5
+#   tx_pin: 4
+#   baud_rate: 9600
+#   stop_bits: 1
+
+# sensor:
+#   - platform: pzemac
+#     current:
+#       name: "PZEM-004T V3 Current"
+#     voltage:
+#       name: "PZEM-004T V3 Voltage"
+#     power:
+#       name: "PZEM-004T V3 Power"
+#     frequency:
+#       name: "PZEM-004T V3 Frequency"
+#     power_factor:
+#       name: "PZEM-004T V3 Power Factor"
+#     update_interval: 20s
+    
+    
+light:
+  - platform: fastled_clockless
+    chipset: WS2811
+    pin: GPIO12
+    num_leds: 29
+    rgb_order: BRG
+    name: "FastLED WS2811 Light"
+    effects:
+      - random:
+      - random:
+          name: Random Effect With Custom Values
+          transition_length: 5s
+          update_interval: 7s
+      - strobe:
+      - addressable_rainbow:
+      - addressable_color_wipe:
+      - addressable_scan:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+      - flicker:
+      - flicker:
+          name: Flicker Effect With Custom Values
+          alpha: 95%
+          intensity: 1.5%
