@@ -20,12 +20,12 @@ ota:
   password: !secret ota_pw
 
 logger:
+  baud_rate: 0
 
 esphome:
   name: ${devicename}
   platform: ESP8266
   board: esp01_1m
-
 
 binary_sensor:
   - platform: gpio
@@ -42,8 +42,39 @@ switch:
     name: "继电器"
     pin: GPIO12
     id: relay
+    restore_mode: RESTORE_DEFAULT_ON
 
 status_led:
   pin:
     number: GPIO13
     inverted: yes
+
+uart:
+  rx_pin: RX
+  tx_pin: TX
+  baud_rate: 9600
+
+modbus:
+
+sensor:
+  - platform: pzemac
+    current:
+      name: "current"
+    voltage:
+      name: "voltage"
+    energy:
+      name: "energy"
+      filters:
+        - lambda: return x/1000;
+      unit_of_measurement: "kWh"
+      state_class: "measurement"
+      device_class: "energy"
+      accuracy_decimals: 5
+    power:
+      name: "power"
+    frequency:
+      name: "frequency"
+    power_factor:
+      name: "powerFactor"
+    update_interval: 5s
+

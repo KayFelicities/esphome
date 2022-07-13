@@ -8,16 +8,17 @@ wifi:
   ap:
     ssid: ${devicename}
     password: !secret ap_pw
-captive_portal:
-web_server:
-  port: !secret web_port
-  auth:
-    username: !secret web_user
-    password: !secret web_pw
+# captive_portal:
+# web_server:
+#   port: !secret web_port
+#   auth:
+#     username: !secret web_user
+#     password: !secret web_pw
 api:
   password: !secret api_pw
 ota:
   password: !secret ota_pw
+  num_attempts: 3
 
 logger:
 
@@ -48,6 +49,7 @@ binary_sensor:
       - switch.toggle: relay
   - platform: gpio
     name: "左窗"
+    device_class: window
     pin:
       number: 2
       mode: INPUT_PULLUP
@@ -241,6 +243,7 @@ sensor:
 switch:
   - platform: gpio
     name: "窗灯"
+    icon: mdi:window-open-variant
     pin: GPIO12
     id: relay
 

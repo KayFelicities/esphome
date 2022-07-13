@@ -1,10 +1,5 @@
 substitutions:
-  devicename: esp32s
-
-esphome:
-  name: ${devicename}
-  platform: ESP32
-  board: nodemcu-32s
+  devicename: home-center
 
 wifi:
   ssid: !secret wifi_ssid
@@ -13,24 +8,42 @@ wifi:
   ap:
     ssid: ${devicename}
     password: !secret ap_pw
-captive_portal:
-web_server:
-  port: !secret web_port
-  auth:
-    username: !secret web_user
-    password: !secret web_pw
+# captive_portal:
+# web_server:
+#   port: !secret web_port
+#   auth:
+#     username: !secret web_user
+#     password: !secret web_pw
 api:
   password: !secret api_pw
 ota:
   password: !secret ota_pw
 
 logger:
+  level: INFO
+
+esphome:
+  name: ${devicename}
+  platform: ESP32
+  board: esp-wrover-kit
+
 
 esp32_ble_tracker:
+  scan_parameters:
+    interval: 320ms
+    window: 160ms
+    
 
-uart:
-  rx_pin: GPIO23
-  baud_rate: 9600
+light:
+  - platform: binary
+    name: "LEDonBoard"
+    output: light_output
+
+output:
+  - id: light_output
+    platform: gpio
+    inverted: True
+    pin: GPIO23
 
 sensor:
   - platform: xiaomi_cgg1
@@ -39,17 +52,10 @@ sensor:
       name: "CGG1 Temperature"
     humidity:
       name: "CGG1 Humidity"
+      icon: mdi:water-percent
     battery_level:
       name: "CGG1 Battery"
-
-  - platform: pmsx003
-    type: PMSX003
-    pm_1_0:
-      name: "Particulate Matter <1.0µm Concentration"
-    pm_2_5:
-      name: "Particulate Matter <2.5µm Concentration"
-    pm_10_0:
-      name: "Particulate Matter <10.0µm Concentration"
+      icon: mdi:battery-80
 
   - platform: xiaomi_miscale2
     mac_address: '5C:CA:D3:5D:A1:C6'

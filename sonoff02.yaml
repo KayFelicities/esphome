@@ -33,15 +33,17 @@ binary_sensor:
       number: GPIO0
       mode: INPUT_PULLUP
       inverted: True
-    name: "Button"
+    name: "button"
     on_press:
       - switch.toggle: relay
   - platform: gpio
-    name: "gpio2"
+    name: "switch"
     pin:
       number: 2
       mode: INPUT_PULLUP
-      
+    on_state:
+      - switch.toggle: relay
+
 switch:
   - platform: gpio
     name: "Sonoff Basic Relay"

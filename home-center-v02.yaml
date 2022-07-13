@@ -1,0 +1,352 @@
+substitutions:
+  devicename: home-center-v02
+  mqttTopicPre: "homeCenterV02"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+  ap:
+    ssid: ${devicename}
+    password: !secret ap_pw
+# captive_portal:
+# web_server:
+#   port: !secret web_port
+#   auth:
+#     username: !secret web_user
+#     password: !secret web_pw
+api:
+  password: !secret api_pw
+ota:
+  password: !secret ota_pw
+
+logger:
+  level: DEBUG
+
+esphome:
+  name: ${devicename}
+  platform: ESP32
+  board: esp-wrover-kit
+
+# esp32_ble_tracker:
+#   scan_parameters:
+#     interval: 320ms
+#     window: 160ms
+    
+mqtt:
+  broker: 192.168.50.10
+
+remote_receiver:
+  - id: receiver_433M
+    pin: 
+      number: GPIO19
+    tolerance: 50%
+    filter: 500us
+    idle: 3ms
+
+  - id: receiver_38K
+    pin:
+      number: GPIO16
+      inverted: True
+    # dump: all
+    on_lg:
+      receiver_id: receiver_38K
+      then:
+      - lambda: |-
+          if (x.data & 0x10000000) {
+            id(climate_switch).publish_state(true);
+          } else {
+            id(climate_switch).publish_state(false);
+          }
+
+# status_led:
+#   pin:
+#     number: GPIO13
+#     inverted: yes
+
+binary_sensor:
+  - platform: gpio
+    name: "门"
+    device_class: door
+    pin:
+      number: GPIO23
+      mode: INPUT_PULLUP
+    filters:
+      - delayed_on: 100ms
+      - delayed_off: 100ms
+  - platform: gpio
+    name: "门2"
+    device_class: door
+    pin:
+      number: GPIO4
+      mode: INPUT_PULLUP
+    filters:
+      - delayed_on: 100ms
+      - delayed_off: 100ms
+
+  - platform: remote_receiver
+    receiver_id: receiver_433M
+    name: "rf1"
+    filters:
+      - delayed_off: 240ms
+    rc_switch_raw: 
+      code: "000001000101111011010001"
+    on_multi_click:
+    - timing:
+        - ON for at most 1s
+        - OFF for at least 300ms
+      then:
+        - logger.log: "dot"
+        - mqtt.publish:
+            topic: ${mqttTopicPre}/rf1/dot
+            payload: "dot"
+      invalid_cooldown: 0s
+    - timing:
+        - ON for at most 1s
+        - OFF for at most 1s
+        - ON for at most 1s
+        - OFF for at least 300ms
+      then:
+        - logger.log: "dot dot"
+        - mqtt.publish:
+            topic: ${mqttTopicPre}/rf1/dotdot
+            payload: "dotdot"
+      invalid_cooldown: 0s
+    - timing:
+        - ON for at least 2s
+      then:
+        - logger.log: "dash"
+        - mqtt.publish:
+            topic: ${mqttTopicPre}/rf1/dash
+            payload: "dash"
+    - timing:
+        - ON for at most 1s
+        - OFF for at most 1s
+        - ON for at least 2s
+      then:
+        - logger.log: "dot dash"
+        - mqtt.publish:
+            topic: ${mqttTopicPre}/rf1/dotdash
+            payload: "dotdash"
+      invalid_cooldown: 0s
+  - platform: remote_receiver
+    receiver_id: receiver_433M
+    name: "rf2"
+    filters:
+      - delayed_off: 240ms
+    rc_switch_raw: 
+      code: "111110000001111011010001"
+    on_multi_click:
+      - timing:
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf2/dot
+              payload: "dot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot dot"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf2/dotdot
+              payload: "dotdot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at least 2s
+        then:
+          - logger.log: "dash"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf2/dash
+              payload: "dash"
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at least 2s
+        then:
+          - logger.log: "dot dash"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf2/dotdash
+              payload: "dotdash"
+        invalid_cooldown: 0s
+  - platform: remote_receiver
+    receiver_id: receiver_433M
+    name: "rf3"
+    filters:
+      - delayed_off: 240ms
+    rc_switch_raw: 
+      code: "111001111101011110100001"
+    on_multi_click:
+      - timing:
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf3/dot
+              payload: "dot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot dot"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf3/dotdot
+              payload: "dotdot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at least 2s
+        then:
+          - logger.log: "dash"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf3/dash
+              payload: "dash"
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at least 2s
+        then:
+          - logger.log: "dot dash"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf3/dotdash
+              payload: "dotdash"
+        invalid_cooldown: 0s
+  - platform: remote_receiver
+    receiver_id: receiver_433M
+    name: "rf3"
+    filters:
+      - delayed_off: 240ms
+    rc_switch_raw: 
+      code: "111011110101001110100001"
+    on_multi_click:
+      - timing:
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf4/dot
+              payload: "dot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at most 1s
+          - OFF for at least 300ms
+        then:
+          - logger.log: "dot dot"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf4/dotdot
+              payload: "dotdot"
+        invalid_cooldown: 0s
+      - timing:
+          - ON for at least 2s
+        then:
+          - logger.log: "dash"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf4/dash
+              payload: "dash"
+      - timing:
+          - ON for at most 1s
+          - OFF for at most 1s
+          - ON for at least 2s
+        then:
+          - logger.log: "dot dash"
+          - mqtt.publish:
+              topic: ${mqttTopicPre}/rf4/dotdash
+              payload: "dotdash"
+        invalid_cooldown: 0s
+
+
+# sensor:
+#   - platform: xiaomi_cgg1
+#     mac_address: "58:2D:34:10:41:3B"
+#     temperature:
+#       name: "CGG1 Temperature"
+#     humidity:
+#       name: "CGG1 Humidity"
+#       icon: mdi:water-percent
+#     battery_level:
+#       name: "CGG1 Battery"
+#       icon: mdi:battery-80
+
+#   - platform: xiaomi_miscale2
+#     mac_address: '5C:CA:D3:5D:A1:C6'
+#     weight:
+#       name: "Scale Weight"
+#       id: weight_miscale
+#       on_value:
+#         then:
+#           - lambda: |-
+#               if (id(weight_miscale).state >= 60 && id(weight_miscale).state < 80) {
+#                 return id(weight_kay).publish_state(x);}
+#               else if (id(weight_miscale).state >= 40 && id(weight_miscale).state < 60) {
+#                 return id(weight_ruby).publish_state(x);}
+#     impedance:
+#       name: "Scale Impedance"
+#       id: impedance_xiaomi
+#       on_value:
+#         then:
+#           - lambda: |-
+#               if (id(weight_miscale).state >= 60 && id(weight_miscale).state < 80) {
+#                 return id(impedance_kay).publish_state(x);}
+#               else if (id(weight_miscale).state >= 40 && id(weight_miscale).state < 60) {
+#                 return id(impedance_ruby).publish_state(x);}
+#   - platform: template
+#     name: Weight Kay
+#     id: weight_kay
+#     unit_of_measurement: 'kg'
+#     icon: mdi:weight-kilogram
+#     accuracy_decimals: 2
+#   - platform: template
+#     name: Impedance Kay
+#     id: impedance_kay
+#     unit_of_measurement: 'ohm'
+#     icon: mdi:omega
+#     accuracy_decimals: 0
+#   - platform: template
+#     name: Weight Ruby
+#     id: weight_ruby
+#     unit_of_measurement: 'kg'
+#     icon: mdi:weight-kilogram
+#     accuracy_decimals: 2
+#   - platform: template
+#     name: Impedance Ruby
+#     id: impedance_ruby
+#     unit_of_measurement: 'ohm'
+#     icon: mdi:omega
+#     accuracy_decimals: 0
+
+remote_transmitter:
+  pin: GPIO14
+  # Infrared remotes use a 50% carrier signal
+  carrier_duty_percent: 50%
+
+switch:
+  - platform: template
+    name: "空调"
+    icon: mdi:air-conditioner
+    id: climate_switch
+    optimistic: true
+    turn_on_action:
+      remote_transmitter.transmit_raw:
+        carrier_frequency: 38kHz
+        code: [9000, -4500, 560, -560, 560, -560, 560, -560, 560, -1680, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -1680, 560, -1680, 560, -1680, 560, -560, 560, -560, 
+                560, -560, 560, -1680, 560, -1680, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -1680, 560, -560, 560, -560, 
+                560, -560, 560, -560, 560, -560, 560, -1680, 560, -1680, 560, -560, 560, -560, 560, -560, 560, -560, 560, -10080]
+
+    turn_off_action:
+      remote_transmitter.transmit_raw:
+        carrier_frequency: 38kHz
+        code: [9000, -4500, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -1680, 560, -1680, 560, -1680, 560, -560, 560, -560, 
+                560, -560, 560, -1680, 560, -1680, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -560, 560, -1680, 560, -560, 560, -560, 
+                560, -560, 560, -560, 560, -560, 560, -1680, 560, -1680, 560, -560, 560, -560, 560, -560, 560, -560, 560, -10080]
+

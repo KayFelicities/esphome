@@ -1,0 +1,51 @@
+substitutions:
+  devicename: sa018-02
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pw
+  fast_connect: true
+  ap:
+    ssid: ${devicename}
+    password: !secret ap_pw
+# captive_portal:
+# web_server:
+#   port: !secret web_port
+#   auth:
+#     username: !secret web_user
+#     password: !secret web_pw
+api:
+  password: !secret api_pw
+ota:
+  password: !secret ota_pw
+
+logger:
+  level: INFO
+
+esphome:
+  name: ${devicename}
+  platform: ESP8266
+  board: esp01_1m
+
+switch:
+  - platform: gpio
+    pin: GPIO12
+    name: "Power Switch"
+    id: relay_sw
+    on_turn_on:
+      output.turn_on: led_sw
+    on_turn_off:
+      output.turn_off: led_sw
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO04
+    id: hw_sw
+    on_state:
+      switch.toggle: relay_sw
+
+output:
+  - platform: gpio
+    pin: GPIO13
+    id: led_sw
+
